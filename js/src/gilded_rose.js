@@ -1,4 +1,4 @@
-function Item(name, sell_in, quality) {
+function Item (name, sell_in, quality) {
   this.name = name;
   this.sell_in = sell_in;
   this.quality = quality;
@@ -14,7 +14,7 @@ Item.MIN_SELLIN = 0;
 
 var items = [];
 
-function update_quality() {
+function update_quality () {
   for (var i = 0; i < items.length; i++) {
     update_item_quality(items[i]);
   }
@@ -24,30 +24,29 @@ function update_item_quality (item) {
     if (isNotAged(item) && isNotBackstage(item)) {
       decreaseQuality(item);
     } else {
-      if (item.quality < Item.MAX_QUALITY) {
-        item.quality = item.quality + Item.QUALITY_GRANULARITY;
-        if (isBackstage(item)) {
-          if (item.sell_in < Item.DOUBLE_THRESHOLD) {
-            increaseQuality(item);
-          }
-          if (item.sell_in < Item.TRIPLE_THRESHOLD) {
-            increaseQuality(item);
-          }
+      increaseQuality(item);
+
+      if (isBackstage(item)) {
+        if (item.sell_in < Item.DOUBLE_THRESHOLD) {
+          increaseQuality(item);
+        }
+        if (item.sell_in < Item.TRIPLE_THRESHOLD) {
+          increaseQuality(item);
         }
       }
     }
-    if (isNotSulfuras(item)) {
-      item.sell_in = item.sell_in - Item.SELLIN_GRANULARITY;
-    }
+
+    decreaseSellIn(item);
+
     if (item.sell_in < Item.MIN_SELLIN) {
-      if (isNotAged(item)) {
-        if (isNotBackstage(item)) {
-          decreaseQuality(item);
-        } else {
-          setQualityToZero(item);
-        }
-      } else {
+      if (isAged(item)) {
         increaseQuality(item);
+      } else {
+        if (isBackstage(item)) {
+          setQualityToZero(item);
+        } else {
+          decreaseQuality(item);
+        }
       }
     }
 
@@ -67,12 +66,22 @@ function decreaseQuality (item) {
   }
 }
 
+function decreaseSellIn (item) {
+  if (isNotSulfuras(item)) {
+    item.sell_in = item.sell_in - Item.SELLIN_GRANULARITY;
+  }
+}
+
 function setQualityToZero (item) {
   item.quality = item.quality - item.quality
 }
 
+function isAged (item) {
+  return item.name === 'Aged Brie';
+}
+
 function isNotAged (item) {
-  return item.name != 'Aged Brie';
+  return ! isAged(item);
 }
 
 function isBackstage (item) {
