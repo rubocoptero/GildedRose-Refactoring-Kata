@@ -79,12 +79,12 @@ describe('Gilded Rose updates', function() {
 
   describe('Sulfuras', function () {
     beforeEach(function () {
-      items = [ new Item('Sulfuras, Hand of Ragnaros', 10, 50) ];
+      items = [ new Item('Sulfuras, Hand of Ragnaros', 10, 80) ];
     });
 
     it('should never decrease quality', function () {
       update_quality();
-      expect(items[0].quality).toEqual(50);
+      expect(items[0].quality).toEqual(80);
     });
 
     it('should never decrease sellin', function () {
