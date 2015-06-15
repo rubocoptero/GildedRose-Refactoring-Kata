@@ -15,41 +15,46 @@ Item.MIN_SELLIN = 0;
 var items = [];
 
 function update_quality () {
-  for (var i = 0; i < items.length; i++) {
-    update_item_quality(items[i]);
+  for (var i = 0, ii = items.length; i < ii; i++) {
+    update_item(items[i]);
   }
 }
 
-function update_item_quality (item) {
-    if (isNotAged(item) && isNotBackstage(item)) {
-      decreaseQuality(item);
-    } else {
-      increaseQuality(item);
+function update_item (item) {
+  updateQuality(item);
+  decreaseSellIn(item);
+  updateQualityAgainIfTheSellByDateHasPassed(item);
+}
 
-      if (isBackstage(item)) {
-        if (item.sell_in < Item.DOUBLE_THRESHOLD) {
-          increaseQuality(item);
-        }
-        if (item.sell_in < Item.TRIPLE_THRESHOLD) {
-          increaseQuality(item);
-        }
-      }
-    }
+function updateQuality (item) {
+  if (isNotAged(item) && isNotBackstage(item)) {
+    decreaseQuality(item);
+  } else {
+    increaseQuality(item);
 
-    decreaseSellIn(item);
-
-    if (item.sell_in < Item.MIN_SELLIN) {
-      if (isAged(item)) {
+    if (isBackstage(item)) {
+      if (item.sell_in < Item.DOUBLE_THRESHOLD) {
         increaseQuality(item);
-      } else {
-        if (isBackstage(item)) {
-          setQualityToZero(item);
-        } else {
-          decreaseQuality(item);
-        }
+      }
+      if (item.sell_in < Item.TRIPLE_THRESHOLD) {
+        increaseQuality(item);
       }
     }
+  }
+}
 
+function updateQualityAgainIfTheSellByDateHasPassed (item) {
+  if (sellByDatehasPassed(item)) {
+    if (isAged(item)) {
+      increaseQuality(item);
+    } else {
+      if (isBackstage(item)) {
+        setQualityToZero(item);
+      } else {
+        decreaseQuality(item);
+      }
+    }
+  }
 }
 
 function increaseQuality (item) {
@@ -70,6 +75,10 @@ function decreaseSellIn (item) {
   if (isNotSulfuras(item)) {
     item.sell_in = item.sell_in - Item.SELLIN_GRANULARITY;
   }
+}
+
+function sellByDatehasPassed (item) {
+    return item.sell_in < Item.MIN_SELLIN;
 }
 
 function setQualityToZero (item) {
